@@ -1,0 +1,27 @@
+# Node modules
+node_modules/
+
+# Environment
+.env
+
+# Hardhat
+cache/
+artifacts/
+typechain/
+typechain-types/
+
+# Solidity coverage
+coverage/
+coverage.json
+
+# Hardhat Ignition local deployments
+ignition/deployments/chain-31337
+
+# macOS junk
+.DS_Store
+
+# Logs
+*.log
+
+# Vercel local config
+.vercel/
