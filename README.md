@@ -11,7 +11,7 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <img src="/logo.png" alt="Logo" width="80" height="80">
+  <img src="Frontend/logo.png" alt="Logo" width="80" height="80">
   <h3 align="center">AgriChain - AgriShield</h3>
   <p align="center">
     Blockchain-powered platform for agricultural insurance, carbon credits, lending, and farmer management.
