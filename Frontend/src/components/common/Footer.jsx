@@ -73,17 +73,20 @@ const Footer = () => {
         <Grid container spacing={6}>
           {/* Company Info */}
           <Grid item xs={12} md={4}>
-            <Typography 
-              variant="h5" 
-              gutterBottom 
-              sx={{ 
-                fontWeight: 700,
-                fontFamily: '"Manrope", "Inter", sans-serif',
-                mb: 3,
-              }}
-            >
-              🌾 AgriSheild
-            </Typography>
+            <Box display="flex" alignItems="center" gap={1} mb={2}>
+              <img src="/logo.png" alt="AgriShield Logo" style={{ height: 36, width: 36, objectFit: 'contain' }} />
+              <Typography 
+                variant="h5" 
+                gutterBottom 
+                sx={{ 
+                  fontWeight: 700,
+                  fontFamily: '"Manrope", "Inter", sans-serif',
+                  mb: 0,
+                }}
+              >
+                AgriShield
+              </Typography>
+            </Box>
             <Typography 
               variant="body1" 
               sx={{ 

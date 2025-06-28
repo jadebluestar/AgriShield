@@ -1,10 +1,13 @@
 // src/config/wagmi.js
+
 import { http, createConfig } from 'wagmi'
 import { mainnet, sepolia, polygonMumbai, hardhat } from 'wagmi/chains'
 import { injected, metaMask, coinbaseWallet } from 'wagmi/connectors'
+import { reconnect } from '@wagmi/core'
 
-// ✅ Simple config without WalletConnect (perfect for school projects)
+// ✅ Create config with SSR disabled
 export const config = createConfig({
+  ssr: false, // Important for Vercel to prevent SSR reconnects
   chains: [mainnet, sepolia, polygonMumbai, hardhat],
   connectors: [
     injected(),
@@ -19,10 +22,15 @@ export const config = createConfig({
   },
 })
 
+// ✅ Only run reconnect on client side
+if (typeof window !== 'undefined') {
+  reconnect(config)
+}
+
 // ✅ Contract Addresses organized per chain
 export const CONTRACT_ADDRESSES = {
   [mainnet.id]: {
-    carbonCredit: '0x...',   // TODO: Add real addresses
+    carbonCredit: '0x...',
     farmerNFT: '0x...',
     weatherInsurance: '0x...',
   },
