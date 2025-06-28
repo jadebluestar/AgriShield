@@ -113,7 +113,10 @@ const theme = createTheme({
 function App() {
   useEffect(() => {
     console.log("App component mounted successfully");
-  }, []);
+  
+  if (typeof window !== 'undefined' && window.ethereum) {
+    window.ethereum.removeAllListeners?.()
+  } }, []);
 
   return (
     <ErrorBoundary>
