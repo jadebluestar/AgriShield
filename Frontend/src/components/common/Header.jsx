@@ -68,7 +68,7 @@ const Header = () => {
       <Toolbar>
         {/* Logo */}
         <Box display="flex" alignItems="center" gap={1} sx={{ flexGrow: isMobile ? 1 : 0 }}>
-          <Agriculture color="primary" sx={{ fontSize: 28 }} />
+          <img src="/logo.png" alt="AgriShield Logo" style={{ height: 32, width: 32, objectFit: 'contain' }} />
           <Typography variant="h6" component={Link} to="/" sx={{ 
             textDecoration: 'none', 
             color: 'inherit',

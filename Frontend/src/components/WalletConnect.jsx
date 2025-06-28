@@ -18,8 +18,9 @@ const WalletConnect = () => {
   const { connect, connectors, error, isPending } = useConnect()
   const { disconnect } = useDisconnect()
   const connectionAttemptRef = useRef(false)
-  const isDev = process.env.NODE_ENV === 'development'
-  const isVercel = process.env.VERCEL === '1'
+  // Use Vite's import.meta.env for environment variables
+  const isDev = import.meta.env.MODE === 'development'
+  const isVercel = import.meta.env.VERCEL === '1'
 
 const connectionDelay = isDev ? 100 : 500
 

@@ -144,7 +144,7 @@ const Home = () => {
         action: () => navigate('/'),
         description: 'Connect your wallet to access AgriShield services'
       };
-    } else if (!isRegistered()) {
+    } else if (!isRegistered) {
       return {
         text: 'Register & Mint Farmer NFT',
         action: () => navigate('/register'),
@@ -192,22 +192,25 @@ const Home = () => {
         <Container maxWidth="lg" sx={{ px: { xs: 3, md: 4 }, position: 'relative', zIndex: 1 }}>
           <Fade in={isVisible} timeout={1200}>
             <Box>
-              <Typography 
-                variant={isMobile ? "h2" : "h1"} 
-                component="h1" 
-                gutterBottom 
-                sx={{ 
-                  fontWeight: 700, 
-                  mb: 4,
-                  fontSize: { xs: '2.75rem', md: '4rem' },
-                  color: '#1a365d',
-                  fontFamily: '"Manrope", "Inter", sans-serif',
-                  lineHeight: 1.1,
-                  letterSpacing: '-0.02em',
-                }}
-              >
-                🌾 AgriShield 
-              </Typography>
+              <Box display="flex" alignItems="center" justifyContent="center" gap={0} mb={0}>
+                <img src="/logo.png" alt="AgriShield Logo" style={{ height: 150, width: 150, objectFit: 'contain' }} />
+                <Typography
+                  variant={isMobile ? "h2" : "h1"}
+                  component="h1"
+                  gutterBottom
+                  sx={{
+                    fontWeight: 700,
+                    mb: 0,
+                    fontSize: { xs: '2.75rem', md: '4em' },
+                    color: '#1a365d',
+                    fontFamily: '"Manrope", "Inter", sans-serif',
+                    lineHeight: 1.1,
+                    letterSpacing: '-0.02em',
+                  }}
+                >
+                 AgriShield
+                </Typography>
+              </Box>
               
               <Typography 
                 variant={isMobile ? "h6" : "h5"} 

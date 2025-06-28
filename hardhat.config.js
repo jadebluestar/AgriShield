@@ -11,12 +11,6 @@ module.exports = {
     cache: "./Backend/cache",
   },
   defaultNetwork: "hardhat",
-  networks: {
-    sepolia: {
-      url: `https://sepolia.infura.io/v3/${process.env.INFURA_API_KEY}`,
-      accounts: [`0x${process.env.PRIVATE_KEY}`],
-    },
-  },
 };
 
 
