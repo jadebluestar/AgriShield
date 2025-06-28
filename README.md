@@ -2,7 +2,7 @@
 <a id="readme-top"></a>
 
 <!-- PROJECT SHIELDS -->
-[![Contributors][contributors-shield]][contributors-url]
+[![Contributors][contributors-shield]][(https://github.com/jadebluestar)(https://github.com/divyansh-audi)(https://github.com/paarth-9k)]
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
@@ -11,7 +11,7 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <img src="Frontend/logo.png" alt="Logo" width="80" height="80">
+  <img src="logo.png" alt="Logo" width="80" height="80">
   <h3 align="center">AgriChain - AgriShield</h3>
   <p align="center">
     Blockchain-powered platform for agricultural insurance, carbon credits, lending, and farmer management.
