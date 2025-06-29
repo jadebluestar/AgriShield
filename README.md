@@ -7,7 +7,9 @@
   <h1 align="center" style="color:#4caf50; font-weight: bold;">AgriShield</h1>
   <p align="center" style="font-size:1.2em; color:#555;">
     <em>Blockchain-powered platform for agricultural insurance, carbon credits, lending, and farmer management.</em>
-    <br />  
+    <br />
+    <a href="#getting-started"><strong>Get Started »</strong></a>
+    <br />
   </p>
 </div>
 
