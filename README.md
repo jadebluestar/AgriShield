@@ -1,30 +1,13 @@
 <!-- Improved compatibility of back to top link -->
 <a id="readme-top"></a>
 
-<!-- PROJECT SHIELDS -->
-<p align="center">
-  <a href="[contributors-url]"><img src="https://img.shields.io/github/contributors/your_username/AgriShieldnish.svg?style=for-the-badge" alt="Contributors"></a>
-  <a href="[forks-url]"><img src="https://img.shields.io/github/forks/your_username/AgriShieldnish.svg?style=for-the-badge" alt="Forks"></a>
-  <a href="[stars-url]"><img src="https://img.shields.io/github/stars/your_username/AgriShieldnish.svg?style=for-the-badge" alt="Stargazers"></a>
-  <a href="[issues-url]"><img src="https://img.shields.io/github/issues/your_username/AgriShieldnish.svg?style=for-the-badge" alt="Issues"></a>
-  <a href="[license-url]"><img src="https://img.shields.io/github/license/your_username/AgriShieldnish.svg?style=for-the-badge" alt="License"></a>
-</p>
-
 <!-- PROJECT LOGO -->
 <div align="center">
-  <img src="Frontend/src/assets/logo.png" alt="Logo" width="120" height="120" style="border-radius: 16px; box-shadow: 0 4px 16px #b2df28; margin-bottom: 10px;" />
-  <h1 align="center" style="color:#4caf50; font-weight: bold;">AgriChain - AgriShield</h1>
+  <img src="assets/logo.png" alt="Logo" width="120" height="120" style="border-radius: 16px; box-shadow: 0 4px 16px #b2df28; margin-bottom: 10px;" />
+  <h1 align="center" style="color:#4caf50; font-weight: bold;">AgriShield</h1>
   <p align="center" style="font-size:1.2em; color:#555;">
     <em>Blockchain-powered platform for agricultural insurance, carbon credits, lending, and farmer management.</em>
-    <br />
-    <a href="#getting-started"><strong>Get Started »</strong></a>
-    <br />
-    <br />
-    <a href="#usage">Usage</a>
-    &middot;
-    <a href="#contributing">Contributing</a>
-    &middot;
-    <a href="#license">License</a>
+    <br />  
   </p>
 </div>
 
@@ -40,10 +23,7 @@
     <li><a href="#getting-started">Getting Started</a></li>
     <li><a href="#usage">Usage</a></li>
     <li><a href="#roadmap">Roadmap</a></li>
-    <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
-    <li><a href="#contact">Contact</a></li>
-    <li><a href="#acknowledgments">Acknowledgments</a></li>
   </ol>
 </details>
 
@@ -54,7 +34,7 @@
 - 🌦️ **Weather-triggered crop insurance**
 - 🌳 **Carbon credit management**
 - 🧑‍🌾 **Farmer NFT registration**
-- 💸 **Lending interface**
+- 💸 **Lending interface(in progress)**
 - 🔒 **Transparent and secure smart contracts**
 
 The platform leverages blockchain (Ethereum/Hardhat), React, and Vite for a seamless user experience and robust backend.
@@ -79,7 +59,7 @@ The platform leverages blockchain (Ethereum/Hardhat), React, and Vite for a seam
 - 🌦️ Weather-triggered insurance smart contract
 - 🌳 Carbon credit tracking and trading
 - 🧑‍🌾 Farmer NFT registration and management
-- 💸 Lending and borrowing interface
+- 💸 Lending and borrowing interface(in progress)
 - 📊 Dashboard with stats, weather widget, and activity table
 - 👛 Wallet connection and profile management
 
@@ -132,7 +112,7 @@ Follow these steps to run the project locally.
 - Purchase weather insurance
 - Track and trade carbon credits
 - Access dashboard for stats and weather
-- Use lending interface for loans
+- Use lending interface for loans(in progress)
 
 _For more details, see the documentation in the `Frontend/src` and `Backend/contracts` folders._
 
@@ -142,27 +122,9 @@ _For more details, see the documentation in the `Frontend/src` and `Backend/cont
 - [x] Weather insurance smart contract
 - [x] Carbon credit module
 - [x] Farmer NFT registration
-- [x] Lending interface
-- [ ] Oracle integration for real weather data
-- [ ] Mobile responsive UI
+- [x] Mobile responsive UI
+- [ ] Lending interface
 - [ ] Multi-chain support
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-## 🤝 Contributing
-
-Contributions are welcome! Please fork the repo and submit a pull request.
-
-```sh
-# 1. Fork the Project
-# 2. Create your Feature Branch
-git checkout -b feature/AmazingFeature
-# 3. Commit your Changes
-git commit -m 'Add some AmazingFeature'
-# 4. Push to the Branch
-git push origin feature/AmazingFeature
-# 5. Open a Pull Request
-```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -172,35 +134,3 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-## 📬 Contact
-
-Project Maintainer: [Your Name](mailto:your.email@example.com)
-
-Project Link: [https://github.com/your_username/AgriShieldnish](https://github.com/your_username/AgriShieldnish)
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-## 🙏 Acknowledgments
-
-- [Choose an Open Source License](https://choosealicense.com)
-- [Hardhat](https://hardhat.org/)
-- [Vite](https://vitejs.dev/)
-- [React](https://reactjs.org/)
-- [Wagmi](https://wagmi.sh/)
-- [Img Shields](https://shields.io)
-- [Font Awesome](https://fontawesome.com)
-- [React Icons](https://react-icons.github.io/react-icons/search)
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-<!-- MARKDOWN LINKS & IMAGES -->
-[contributors-shield]: https://img.shields.io/github/contributors/your_username/AgriShieldnish.svg?style=for-the-badge
-[contributors-url]: https://github.com/your_username/AgriShieldnish/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/your_username/AgriShieldnish.svg?style=for-the-badge
-[forks-url]: https://github.com/your_username/AgriShieldnish/network/members
-[stars-shield]: https://img.shields.io/github/stars/your_username/AgriShieldnish.svg?style=for-the-badge
-[stars-url]: https://github.com/your_username/AgriShieldnish/stargazers
-[issues-shield]: https://img.shields.io/github/issues/your_username/AgriShieldnish.svg?style=for-the-badge
-[issues-url]: https://github.com/your_username/AgriShieldnish/issues
-[license-shield]: https://img.shields.io/github/license/your_username/AgriShieldnish.svg?style=for-the-badge
-[license-url]: https://github.com/your_username/AgriShieldnish/blob/main/LICENSE
