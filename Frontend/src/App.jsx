@@ -16,7 +16,6 @@ import Footer from './components/common/Footer';
 import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
 import Insurance from './pages/Insurance';
-import Lending from './pages/Lending';
 import CarbonCredits from './pages/CarbonCredits';
 import Profile from './pages/Profile';
 import Registration from './pages/Registration';
@@ -136,11 +135,9 @@ function App() {
                         <Route path="/" element={<Home />} />
                         <Route path="/dashboard" element={<Dashboard />} />
                         <Route path="/insurance" element={<Insurance />} />
-                        <Route path="/lending" element={<Lending />} />
                         <Route path="/carbon" element={<CarbonCredits />} />
                         <Route path="/profile" element={<Profile />} />
                         <Route path="/register" element={<Registration />} />
-                        {/* ✅ These match the smaller version’s minimal routes */}
                       </Routes>
                     </main>
                     <Footer />
