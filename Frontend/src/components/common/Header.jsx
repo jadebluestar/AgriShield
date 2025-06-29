@@ -51,7 +51,6 @@ const Header = () => {
     { label: 'Home', path: '/' },
     { label: 'Dashboard', path: '/dashboard' },
     { label: 'Insurance', path: '/insurance' },
-    { label: 'Lending', path: '/lending' },
     { label: 'Carbon Credits', path: '/carbon' },
     { label: 'Profile', path: '/profile' },
   ]
@@ -67,16 +66,9 @@ const Header = () => {
     }}>
       <Toolbar>
         {/* Logo */}
-        <Box display="flex" alignItems="center" gap={1} sx={{ flexGrow: isMobile ? 1 : 0 }}>
-          <Agriculture color="primary" sx={{ fontSize: 28 }} />
-          <Typography variant="h6" component={Link} to="/" sx={{ 
-            textDecoration: 'none', 
-            color: 'inherit',
-            fontWeight: 'bold'
-          }}>
-            AgriShield
-          </Typography>
-        </Box>
+        <Box>
+           🌾 AgriShield
+          </Box>
 
         {/* Desktop Navigation */}
         {!isMobile && (

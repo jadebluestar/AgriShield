@@ -1,84 +1,59 @@
-import { useState, useEffect } from 'react';
-import Web3 from 'web3';
+// src/hooks/useWallet.js
+import { useAccount, useConnect, useDisconnect } from 'wagmi';
+import { useEffect, useState } from 'react';
 
 export const useWallet = () => {
-  const [web3, setWeb3] = useState(null);
-  const [account, setAccount] = useState('');
-  const [connected, setConnected] = useState(false);
-  const [chainId, setChainId] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const { isConnected, address, chainId } = useAccount();
+  const { connect, connectors, isLoading, error } = useConnect();
+  const { disconnect } = useDisconnect();
+  const [isConnecting, setIsConnecting] = useState(false);
 
-  const connectWallet = async () => {
-    if (!window.ethereum) {
-      setError('MetaMask is not installed');
-      return;
+  // Reset connecting state when connection completes
+  useEffect(() => {
+    if (isConnected) {
+      setIsConnecting(false);
     }
+  }, [isConnected]);
 
-    setLoading(true);
-    setError('');
-
+  const connectWallet = async (connectorId) => {
     try {
-      const web3Instance = new Web3(window.ethereum);
-      await window.ethereum.request({ method: 'eth_requestAccounts' });
-      
-      const accounts = await web3Instance.eth.getAccounts();
-      const networkId = await web3Instance.eth.getChainId();
-      
-      setWeb3(web3Instance);
-      setAccount(accounts[0]);
-      setChainId(Number(networkId));
-      setConnected(true);
-      
-      localStorage.setItem('walletConnected', 'true');
-    } catch (error) {
-      setError('Failed to connect wallet');
-    } finally {
-      setLoading(false);
+      setIsConnecting(true);
+      const connector = connectors.find(c => c.id === connectorId);
+      if (connector) {
+        await connect({ connector });
+      }
+    } catch (err) {
+      console.error('Connection failed:', err);
+      setIsConnecting(false);
     }
   };
 
   const disconnectWallet = () => {
-    setWeb3(null);
-    setAccount('');
-    setConnected(false);
-    setChainId(null);
-    setError('');
-    localStorage.removeItem('walletConnected');
+    disconnect();
+    setIsConnecting(false);
   };
 
-  useEffect(() => {
-    const checkConnection = async () => {
-      if (window.ethereum && localStorage.getItem('walletConnected')) {
-        await connectWallet();
+  // Auto-connect MetaMask if available
+  const autoConnect = async () => {
+    const metaMaskConnector = connectors.find(c => c.name === 'MetaMask');
+    if (metaMaskConnector && !isConnected) {
+      try {
+        await connectWallet(metaMaskConnector.id);
+      } catch (err) {
+        console.log('Auto-connect failed:', err);
       }
-    };
-
-    checkConnection();
-
-    if (window.ethereum) {
-      window.ethereum.on('accountsChanged', (accounts) => {
-        if (accounts.length === 0) {
-          disconnectWallet();
-        } else {
-          setAccount(accounts[0]);
-        }
-      });
-      
-      window.ethereum.on('chainChanged', (chainId) => {
-        setChainId(parseInt(chainId, 16));
-      });
     }
-  }, []);
+  };
 
   return {
-    web3,
-    account,
-    connected,
+    isConnected,
+    address,
     chainId,
-    loading,
+    connectors,
+    isLoading: isLoading || isConnecting,
     error,
     connectWallet,
     disconnectWallet,
+    autoConnect,
   };
 };

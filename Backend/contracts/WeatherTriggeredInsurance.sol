@@ -2,11 +2,9 @@
 
 pragma solidity ^0.8.19;
 
-// Replace forge-std imports with standard imports
-// import {console} from "forge-std/console.sol"; // Remove this - use hardhat/console.sol if needed
-import "hardhat/console.sol"; // Add this if you need console logging
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol"; // Replace forge-std IERC721
-// Remove DevOpsTools import - implement alternative if needed
+import {console} from "forge-std/console.sol";
+import {IERC721} from "forge-std/interfaces/IERC721.sol";
+import {DevOpsTools} from "lib/foundry-devops/src/DevOpsTools.sol";
 import {AutomationCompatibleInterface} from
     "@chainlink/contracts/src/v0.8/automation/interfaces/AutomationCompatibleInterface.sol";
 import {FunctionsClient} from "@chainlink/contracts/src/v0.8/functions/v1_3_0/FunctionsClient.sol";
@@ -91,7 +89,7 @@ contract WeatherTriggeredInsurance is FunctionsClient, ConfirmedOwner, Automatio
 
     function getTimePeriodBasedOnFundingProvided(uint256 _amountFunded) public pure returns (uint256) {
         uint256 baseTime = 365 days;
-        return (baseTime * 0.001 ether) / _amountFunded;
+        return (baseTime * _amountFunded) / 0.001 ether;
     }
 
     function checkUpkeep(bytes calldata /*checkData*/ )
@@ -110,7 +108,7 @@ contract WeatherTriggeredInsurance is FunctionsClient, ConfirmedOwner, Automatio
         if (s_addressToLastRainCheck[s_InsuranceUsers[checkIndex]] == 0) {
             wholeDayPassed = true;
         } else {
-            wholeDayPassed = (currentTime - s_addressToLastRainCheck[s_InsuranceUsers[checkIndex]]) > 150;
+            wholeDayPassed = (currentTime - s_addressToLastRainCheck[s_InsuranceUsers[checkIndex]]) > 24 hours;
         }
 
         upkeepNeeded = (validInsurance && wholeDayPassed);
@@ -149,7 +147,7 @@ contract WeatherTriggeredInsurance is FunctionsClient, ConfirmedOwner, Automatio
         address user = s_requestIdToUser[requestId];
         bool drought = isDrought(user, rainfall);
         if (drought) {
-            uint256 amount = 0.005 ether;
+            uint256 amount = (address(this).balance / s_InsuranceUsers.length);
             (bool success,) = user.call{value: amount}("");
             if (!success) {
                 revert WeatherTriggeredInsurance__TransferFailed();
@@ -168,11 +166,11 @@ contract WeatherTriggeredInsurance is FunctionsClient, ConfirmedOwner, Automatio
     }
 
     function sendRequest(uint64 subscriptionId, string[] memory args) public onlyOwner returns (bytes32 requestId) {
-        require(bytes(s_source).length > 0, "Source code not set");
-        require(subscriptionId > 0, "Invalid subscription ID");
-        require(args.length >= 2, "Missing args"); // Since you need location + API key
-        require(bytes(args[0]).length > 0, "Location empty");
-        require(bytes(args[1]).length > 0, "API key empty");
+        // require(bytes(s_source).length > 0, "Source code not set");
+        // require(subscriptionId > 0, "Invalid subscription ID");
+        // require(args.length >= 2, "Missing args"); // Since you need location + API key
+        // require(bytes(args[0]).length > 0, "Location empty");
+        // require(bytes(args[1]).length > 0, "API key empty");
         FunctionsRequest.Request memory req;
         req.initializeRequestForInlineJavaScript(s_source); // Initialize the request with JS code
         if (args.length > 0) req.setArgs(args); // Set the arguments for the request

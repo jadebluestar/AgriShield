@@ -1,8 +1,14 @@
-import { useContractWrite, useContractRead, useWaitForTransactionReceipt, useChainId } from 'wagmi';
+// src/hooks/useContracts.js
+import { 
+  useWriteContract, 
+  useReadContract, 
+  useWaitForTransactionReceipt, 
+  useChainId 
+} from 'wagmi';
 import { CONTRACT_ADDRESSES, FARMER_NFT_ABI } from '../config/wagmi';
 
 // -------------------------------
-// ✅ FarmerNFT Hook (Hybridized)
+// ✅ FarmerNFT Hook (Wagmi v2 Updated)
 // -------------------------------
 export const useFarmerNFT = () => {
   const chainId = useChainId();
@@ -11,15 +17,11 @@ export const useFarmerNFT = () => {
   const {
     data: nftHash,
     error: nftError,
-    isLoading: nftPending,
-    write: mintNftWrite
-  } = useContractWrite({
-    address: CONTRACT_ADDRESS,
-    abi: FARMER_NFT_ABI,
-    functionName: 'mintNft',
-  });
+    isPending: nftPending,
+    writeContract
+  } = useWriteContract();
 
-  // ✅ Modern pattern: register farmer with base64 JSON metadata
+  // ✅ Updated: register farmer with new Wagmi v2 pattern
   const registerFarmer = async (to, name, location, cropType) => {
     try {
       const farmerData = {
@@ -35,11 +37,15 @@ export const useFarmerNFT = () => {
       const base64 = btoa(jsonString);
       const tokenUri = `data:application/json;base64,${base64}`;
 
-      if (!mintNftWrite) {
-        throw new Error('mintNftWrite function not available');
+      if (!CONTRACT_ADDRESS) {
+        throw new Error('Contract address not found for current chain');
       }
 
-      mintNftWrite({
+      // ✅ New Wagmi v2 syntax
+      writeContract({
+        address: CONTRACT_ADDRESS,
+        abi: FARMER_NFT_ABI,
+        functionName: 'mintNft',
         args: [tokenUri]
       });
 
@@ -49,26 +55,30 @@ export const useFarmerNFT = () => {
     }
   };
 
-  // ✅ Read: Check NFT balance
+  // ✅ Updated: Check NFT balance with new hook
   const useHasNFT = (address) => {
-    return useContractRead({
+    return useReadContract({
       address: CONTRACT_ADDRESS,
       abi: FARMER_NFT_ABI,
       functionName: 'balanceOf',
       args: [address],
-      enabled: !!address && !!CONTRACT_ADDRESS,
-      watch: true
+      query: {
+        enabled: !!address && !!CONTRACT_ADDRESS,
+        refetchInterval: 5000, // Replaces 'watch: true'
+      }
     });
   };
 
-  // ✅ Read: Get total NFTs minted (optional helper)
+  // ✅ Updated: Get total NFTs minted
   const useTokenCounter = () => {
-    return useContractRead({
+    return useReadContract({
       address: CONTRACT_ADDRESS,
       abi: FARMER_NFT_ABI,
       functionName: 'getTokenCounter',
-      enabled: !!CONTRACT_ADDRESS,
-      watch: true
+      query: {
+        enabled: !!CONTRACT_ADDRESS,
+        refetchInterval: 5000,
+      }
     });
   };
 
@@ -82,10 +92,12 @@ export const useFarmerNFT = () => {
   };
 };
 
-// ✅ Generic transaction status hook
+// ✅ Transaction status hook (unchanged - this one is still valid)
 export const useTransactionStatus = (hash) => {
   return useWaitForTransactionReceipt({
     hash,
-    enabled: !!hash
+    query: {
+      enabled: !!hash
+    }
   });
 };
