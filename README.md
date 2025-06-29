@@ -3,7 +3,7 @@
 
 <!-- PROJECT LOGO -->
 <div align="center">
-  <img src="assets/logo.png" alt="Logo" width="120" height="120" style="border-radius: 16px; box-shadow: 0 4px 16px #b2df28; margin-bottom: 10px;" />
+  <img src="assets/logo1.png" alt="Logo" width="120" height="120" style="border-radius: 16px; box-shadow: 0 4px 16px #b2df28; margin-bottom: 10px;" />
   <h1 align="center" style="color:#4caf50; font-weight: bold;">AgriShield</h1>
   <p align="center" style="font-size:1.2em; color:#555;">
     <em>Blockchain-powered platform for agricultural insurance, carbon credits, lending, and farmer management.</em>
