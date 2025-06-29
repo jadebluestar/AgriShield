@@ -29,6 +29,7 @@
   </ol>
 </details>
 
+<a id="about-the-project"></a>
 ## 🌱 About The Project
 
 > **AgriChain - AgriShield** is a decentralized platform empowering farmers and stakeholders with:
@@ -43,6 +44,7 @@ The platform leverages blockchain (Ethereum/Hardhat), React, and Vite for a seam
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
+<a id="built-with"></a>
 ## 🛠️ Built With
 <p align="center">
   <img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" />
@@ -56,6 +58,7 @@ The platform leverages blockchain (Ethereum/Hardhat), React, and Vite for a seam
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
+<a id="features"></a>
 ## ✨ Features
 
 - 🌦️ Weather-triggered insurance smart contract
@@ -67,6 +70,7 @@ The platform leverages blockchain (Ethereum/Hardhat), React, and Vite for a seam
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
+<a id="getting-started"></a>
 ## 🚀 Getting Started
 
 Follow these steps to run the project locally.
@@ -108,6 +112,7 @@ Follow these steps to run the project locally.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
+<a id="usage"></a>
 ## 🧑‍💻 Usage
 
 - Register as a farmer and mint your NFT
@@ -120,6 +125,7 @@ _For more details, see the documentation in the `Frontend/src` and `Backend/cont
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
+<a id="roadmap"></a>
 ## 🗺️ Roadmap
 - [x] Weather insurance smart contract
 - [x] Carbon credit module
@@ -130,6 +136,7 @@ _For more details, see the documentation in the `Frontend/src` and `Backend/cont
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
+<a id="license"></a>
 ## 📄 License
 
 Distributed under the MIT License. See `LICENSE` for more information.
