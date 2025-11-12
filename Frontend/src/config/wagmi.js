@@ -50,5 +50,5 @@ export const CONTRACT_ADDRESSES = {
   },
 }
 
-export { FARMER_NFT_ABI, INSURANCE_ABI } from '../abi/farmerAndInsurance'
+export { FARMER_NFT_ABI, SIMPLE_INSURANCE_ABI, INSURANCE_ABI } from '../abi/farmerAndInsurance'
 export { CARBON_CREDIT_ABI } from '../abi/carbon'

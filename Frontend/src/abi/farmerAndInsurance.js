@@ -259,6 +259,67 @@ export const FARMER_NFT_ABI = [
 
 
 // Insurance ABI - Add your actual ABI here
+export const SIMPLE_INSURANCE_ABI = [
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_farmerNft", "type": "address" }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "internalType": "address", "name": "farmer", "type": "address" },
+      { "indexed": false, "internalType": "string", "name": "location", "type": "string" },
+      { "indexed": false, "internalType": "uint256", "name": "coverage", "type": "uint256" },
+      { "indexed": false, "internalType": "uint256", "name": "premium", "type": "uint256" }
+    ],
+    "name": "PolicyCreated",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      { "internalType": "string", "name": "location", "type": "string" },
+      { "internalType": "uint256", "name": "coverageAmount", "type": "uint256" }
+    ],
+    "name": "createPolicy",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "cancelPolicy",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "farmer", "type": "address" }
+    ],
+    "name": "getPolicy",
+    "outputs": [
+      {
+        "components": [
+          { "internalType": "address", "name": "farmer", "type": "address" },
+          { "internalType": "string", "name": "location", "type": "string" },
+          { "internalType": "uint256", "name": "coverageAmount", "type": "uint256" },
+          { "internalType": "uint256", "name": "premiumPaid", "type": "uint256" },
+          { "internalType": "bool", "name": "active", "type": "bool" }
+        ],
+        "internalType": "struct WeatherInsurance.Policy",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]
+
+// Legacy complex insurance ABI retained for future use
 export const INSURANCE_ABI =[
   {
     "inputs": [
@@ -277,6 +338,27 @@ export const INSURANCE_ABI =[
   { "inputs": [], "name": "EmptySource", "type": "error" },
   { "inputs": [], "name": "NoInlineSecrets", "type": "error" },
   { "inputs": [], "name": "OnlyRouterCanFulfill", "type": "error" },
+    {
+      "inputs": [],
+      "name": "cancelInsurance",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [{ "internalType": "string", "name": "newSource", "type": "string" }],
+      "name": "setSource",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [{ "internalType": "string", "name": "newKey", "type": "string" }],
+      "name": "setApiKey",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
   {
     "inputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
     "name": "UnexpectedRequestID",

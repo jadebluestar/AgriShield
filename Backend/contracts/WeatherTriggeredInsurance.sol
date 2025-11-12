@@ -2,9 +2,8 @@
 
 pragma solidity ^0.8.19;
 
-import {console} from "forge-std/console.sol";
-import {IERC721} from "forge-std/interfaces/IERC721.sol";
-import {DevOpsTools} from "lib/foundry-devops/src/DevOpsTools.sol";
+// Removed foundry-only imports to make this contract compile in Hardhat
+import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import {AutomationCompatibleInterface} from
     "@chainlink/contracts/src/v0.8/automation/interfaces/AutomationCompatibleInterface.sol";
 import {FunctionsClient} from "@chainlink/contracts/src/v0.8/functions/v1_3_0/FunctionsClient.sol";
@@ -39,6 +38,8 @@ contract WeatherTriggeredInsurance is FunctionsClient, ConfirmedOwner, Automatio
     mapping(bytes32 => address) private s_requestIdToUser;
     mapping(address => uint256[7]) private s_addressToRainData;
     mapping(address => uint256) private s_addressToTimeAPIIsCalled;
+    mapping(address => uint256) private s_addressToPremiumPaid;
+    mapping(address => uint256) private s_addressToStartTime;
 
     constructor(
         address router,
@@ -68,6 +69,7 @@ contract WeatherTriggeredInsurance is FunctionsClient, ConfirmedOwner, Automatio
     event LocationAssigned(address indexed user);
     event DroughtPayout(address indexed user, uint256 amount);
     event AddressToAPICalledUpdated(uint256 indexed valueOfNumberofCalls);
+    event InsuranceCancelled(address indexed user, uint256 refundAmount);
 
     function getInsurance(string memory location) public payable {
         //Follow CEI
@@ -85,6 +87,8 @@ contract WeatherTriggeredInsurance is FunctionsClient, ConfirmedOwner, Automatio
         emit TimePeriodAssigned();
         s_addressToFarmerLocation[msg.sender] = location;
         emit LocationAssigned(msg.sender);
+        s_addressToPremiumPaid[msg.sender] = msg.value;
+        s_addressToStartTime[msg.sender] = block.timestamp;
     }
 
     function getTimePeriodBasedOnFundingProvided(uint256 _amountFunded) public pure returns (uint256) {
@@ -165,7 +169,8 @@ contract WeatherTriggeredInsurance is FunctionsClient, ConfirmedOwner, Automatio
         }
     }
 
-    function sendRequest(uint64 subscriptionId, string[] memory args) public onlyOwner returns (bytes32 requestId) {
+    // Removed onlyOwner so Chainlink Automation can trigger via performUpkeep
+    function sendRequest(uint64 subscriptionId, string[] memory args) public returns (bytes32 requestId) {
         // require(bytes(s_source).length > 0, "Source code not set");
         // require(subscriptionId > 0, "Invalid subscription ID");
         // require(args.length >= 2, "Missing args"); // Since you need location + API key
@@ -179,6 +184,66 @@ contract WeatherTriggeredInsurance is FunctionsClient, ConfirmedOwner, Automatio
         s_lastRequestId = _sendRequest(req.encodeCBOR(), subscriptionId, i_gasLimit, i_donID);
 
         return s_lastRequestId;
+    }
+
+    // Allow owner to update AccuWeather JS source and API key
+    function setSource(string memory newSource) external onlyOwner {
+        s_source = newSource;
+    }
+
+    function setApiKey(string memory newKey) external onlyOwner {
+        s_apiKey = newKey;
+    }
+
+    function setSubscription(uint64 newSub) external onlyOwner {
+        s_subscriptionId = newSub;
+    }
+
+    // Helper: recommended default AccuWeather source
+    // args[0] = city name; args[1] = apiKey
+    function getRecommendedAccuWeatherSource() external pure returns (string memory) {
+        return string(
+            abi.encodePacked(
+                "const city = args[0];\n",
+                "const apiKey = args[1];\n",
+                "// 1) get location key\n",
+                "const locUrl = `https://dataservice.accuweather.com/locations/v1/cities/search?apikey=${apiKey}&q=${encodeURIComponent(city)}`;\n",
+                "const locRes = await fetch(locUrl);\n",
+                "if (!locRes.ok) throw new Error('Location lookup failed');\n",
+                "const locData = await locRes.json();\n",
+                "if (!Array.isArray(locData) || locData.length === 0) throw new Error('City not found');\n",
+                "const key = locData[0].Key;\n",
+                "// 2) get current conditions with precip summary\n",
+                "const wxUrl = `https://dataservice.accuweather.com/currentconditions/v1/${key}?apikey=${apiKey}&details=true`;\n",
+                "const wxRes = await fetch(wxUrl);\n",
+                "if (!wxRes.ok) throw new Error('Weather fetch failed');\n",
+                "const wxData = await wxRes.json();\n",
+                "const mm = Math.floor((wxData?.[0]?.PrecipitationSummary?.Past24Hours?.Metric?.Value) ?? 0);\n",
+                "return Functions.encodeUint256(mm);\n"
+            )
+        );
+    }
+
+    // User can cancel and receive a pro-rated refund of the premium based on remaining period
+    function cancelInsurance() external {
+        uint256 period = s_adressToInsurancePeriod[msg.sender];
+        require(period > 0, "No active policy");
+        uint256 start = s_addressToStartTime[msg.sender];
+        uint256 paid = s_addressToPremiumPaid[msg.sender];
+        uint256 elapsed = block.timestamp > start ? (block.timestamp - start) : 0;
+        uint256 refund = 0;
+        if (elapsed < period) {
+            refund = (paid * (period - elapsed)) / period;
+        }
+        // Mark as inactive
+        s_adressToInsurancePeriod[msg.sender] = 0;
+        s_addressToPremiumPaid[msg.sender] = 0;
+        // best-effort refund
+        if (refund > 0 && address(this).balance >= refund) {
+            (bool ok,) = payable(msg.sender).call{value: refund}("");
+            if (!ok) revert WeatherTriggeredInsurance__TransferFailed();
+        }
+        emit InsuranceCancelled(msg.sender, refund);
     }
 
     function isDrought(address user, uint256 rainfall) public returns (bool) {
@@ -224,5 +289,13 @@ contract WeatherTriggeredInsurance is FunctionsClient, ConfirmedOwner, Automatio
 
     function getInsurancePeriod(address user) external view returns (uint256) {
         return s_adressToInsurancePeriod[user];
+    }
+
+    function getPremiumPaid(address user) external view returns (uint256) {
+        return s_addressToPremiumPaid[user];
+    }
+
+    function getStartTime(address user) external view returns (uint256) {
+        return s_addressToStartTime[user];
     }
 }

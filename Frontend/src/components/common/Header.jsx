@@ -1,5 +1,7 @@
 import React, { useState } from 'react'
 import { useAccount, useDisconnect } from 'wagmi'
+import { useNavigate } from 'react-router-dom'
+import { useAppContext } from '../../context/AppContext'
 import { 
   AppBar, 
   Toolbar, 
@@ -11,19 +13,23 @@ import {
   MenuItem,
   Chip,
   useTheme,
-  useMediaQuery
+  useMediaQuery,
+  Divider
 } from '@mui/material'
 import { 
   Agriculture, 
   AccountBalanceWallet,
   Menu as MenuIcon,
-  ExitToApp
+  ExitToApp,
+  Person
 } from '@mui/icons-material'
 import { Link, useLocation } from 'react-router-dom'
 
 const Header = () => {
   const { address, isConnected, chain } = useAccount()
   const { disconnect } = useDisconnect()
+  const { clearFarmerData } = useAppContext()
+  const navigate = useNavigate()
   const location = useLocation()
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
@@ -45,6 +51,14 @@ const Header = () => {
 
   const handleWalletMenuClose = () => {
     setWalletMenuAnchor(null)
+  }
+
+  const handleLogout = () => {
+    disconnect()
+    clearFarmerData()
+    localStorage.clear()
+    handleWalletMenuClose()
+    navigate('/')
   }
 
   const menuItems = [
@@ -124,7 +138,7 @@ const Header = () => {
                 open={Boolean(walletMenuAnchor)}
                 onClose={handleWalletMenuClose}
               >
-                <MenuItem onClick={handleWalletMenuClose} disabled>
+                <MenuItem disabled>
                   <Box>
                     <Typography variant="body2" fontWeight="bold">
                       {address?.slice(0, 6)}...{address?.slice(-4)}
@@ -134,14 +148,14 @@ const Header = () => {
                     </Typography>
                   </Box>
                 </MenuItem>
-                <MenuItem 
-                  onClick={() => {
-                    disconnect()
-                    handleWalletMenuClose()
-                  }}
-                >
+                <MenuItem component={Link} to="/profile" onClick={handleWalletMenuClose}>
+                  <Person sx={{ mr: 1 }} />
+                  Profile
+                </MenuItem>
+                <Divider />
+                <MenuItem onClick={handleLogout} sx={{ color: 'error.main' }}>
                   <ExitToApp sx={{ mr: 1 }} />
-                  Disconnect
+                  Logout & Disconnect
                 </MenuItem>
               </Menu>
             </>

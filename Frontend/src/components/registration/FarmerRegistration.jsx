@@ -29,12 +29,13 @@ import {
   Warning,
   Info,
 } from '@mui/icons-material';
-import { useApp } from '../../context/AppContext';
+import { useAppContext } from '../../context/AppContext';
 // Replace Web3Context with Wagmi hooks
 import { useAccount } from 'wagmi';
+import { createFarmerNFTMetadata } from '../../services/pinataService';
 
 const FarmerRegistration = () => {
-  const { updateFarmerData } = useApp();
+  const { updateFarmerData } = useAppContext();
   // Use Wagmi's useAccount hook instead of custom Web3 context
   const { address: account, isConnected: connected } = useAccount();
   
@@ -159,34 +160,45 @@ const FarmerRegistration = () => {
     setRegistrationStep(2);
 
     try {
-      // Simulate NFT creation process
-      setTimeout(() => {
-        setRegistrationStep(3);
-        
-        // Update farmer data
-        updateFarmerData({
-          name: formData.name,
-          location: formData.location,
-          cropType: formData.cropType,
-          farmingMethod: formData.farmingMethod,
-          farmSize: `${formData.farmSize} acres`,
-          yearsOfExperience: formData.yearsOfExperience,
-          email: formData.email,
-          phone: formData.phone,
-          kycStatus: 'Verified',
-          nftCreated: true,
-          registrationDate: new Date().toISOString(),
-        });
+      // Create farmer data object
+      const farmerData = {
+        name: formData.name,
+        location: formData.location,
+        cropType: formData.cropType,
+        farmingMethod: formData.farmingMethod,
+        farmSize: `${formData.farmSize} acres`,
+        yearsOfExperience: formData.yearsOfExperience,
+        email: formData.email,
+        phone: formData.phone,
+        walletAddress: account,
+      };
 
-        setTimeout(() => {
-          setLoading(false);
-          setRegistrationStep(4);
-        }, 2000);
-      }, 3000);
+      // Upload to Pinata IPFS (with fallback to base64)
+      const nftMetadata = await createFarmerNFTMetadata(formData.cropImage, farmerData);
+      
+      setRegistrationStep(3);
+      
+      // Update farmer data in context
+      updateFarmerData({
+        ...farmerData,
+        kycStatus: 'Verified',
+        nftCreated: true,
+        registrationDate: new Date().toISOString(),
+        nftMetadataURI: nftMetadata.metadataUri,
+        nftImageURI: nftMetadata.imageUri,
+      });
+
+      // Move to completion step
+      setTimeout(() => {
+        setLoading(false);
+        setRegistrationStep(4);
+      }, 2000);
+      
     } catch (error) {
       console.error('Registration failed:', error);
       setLoading(false);
       setRegistrationStep(1);
+      setErrors({ submit: `Registration failed: ${error.message}` });
     }
   };
 
@@ -376,6 +388,12 @@ const FarmerRegistration = () => {
               >
                 Farmer Registration Form
               </Typography>
+
+              {errors.submit && (
+                <Alert severity="error" sx={{ mb: 3 }}>
+                  {errors.submit}
+                </Alert>
+              )}
 
               <Grid container spacing={4}>
                 {/* Personal Information */}

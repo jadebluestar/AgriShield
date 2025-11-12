@@ -1,377 +1,293 @@
-import React, { useState } from 'react';
-import {
-  Card,
-  CardContent,
-  Typography,
-  Grid,
-  Button,
-  Box,
-  TextField,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Chip,
-  Alert,
-  LinearProgress,
-  Container,
-} from '@mui/material';
-import {
-  Security,
-  CloudQueue,
-  WbSunny,
-  Grain,
-  CheckCircle,
-  Warning,
-} from '@mui/icons-material';
+import React, { useState, useEffect } from 'react';
+import { useInsurance } from '../../hooks/useInsurance';
+import { fetchCurrentWeather } from '../../services/weatherService';
+import { Card, CardContent, Typography, Button, Box, TextField, FormControl, InputLabel, Select, MenuItem, Chip, Alert, Container, Grid, CircularProgress } from '@mui/material';
+import { Security, CloudQueue, WbSunny, Add, Cancel, CheckCircle } from '@mui/icons-material';
 
 const InsuranceModule = () => {
-  const [selectedPolicy, setSelectedPolicy] = useState('');
+  const [location, setLocation] = useState('New York');
   const [coverage, setCoverage] = useState('');
-  const [premium, setPremium] = useState(0);
-  const [loading, setLoading] = useState(false);
-  const [policies, setPolicies] = useState([
-    {
-      id: 1,
-      type: 'Drought Protection',
-      coverage: '$5,000',
-      premium: '$150/month',
-      status: 'Active',
-      trigger: 'No rain for 14 days',
-    },
-    {
-      id: 2,
-      type: 'Flood Insurance',
-      coverage: '$3,000',
-      premium: '$100/month',
-      status: 'Active',
-      trigger: 'Rainfall > 100mm/day',
-    },
-  ]);
+  const [policyType, setPolicyType] = useState('');
+  const [weatherData, setWeatherData] = useState(null);
+  const [weatherLoading, setWeatherLoading] = useState(false);
+  
+  const { policies, createPolicy, cancelPolicy, loading, error, fetchPolicies, isConnected } = useInsurance();
+
+  useEffect(() => {
+    if (isConnected) fetchPolicies();
+  }, [isConnected, fetchPolicies]);
+
+  useEffect(() => {
+    const loadWeather = async () => {
+      if (!location) return;
+      setWeatherLoading(true);
+      try {
+        const weather = await fetchCurrentWeather(location);
+        setWeatherData(weather);
+      } catch (err) {
+        console.error('Weather fetch error:', err);
+      } finally {
+        setWeatherLoading(false);
+      }
+    };
+    loadWeather();
+  }, [location]);
 
   const policyTypes = [
-    { value: 'drought', label: 'Drought Protection', icon: <WbSunny />, premium: 150 },
-    { value: 'flood', label: 'Flood Insurance', icon: <Grain />, premium: 100 },
-    { value: 'hail', label: 'Hail Damage', icon: <CloudQueue />, premium: 120 },
-    { value: 'frost', label: 'Frost Protection', icon: <Security />, premium: 80 },
+    { value: 'drought', label: 'Drought Protection', icon: <WbSunny /> },
+    { value: 'flood', label: 'Flood Insurance', icon: <CloudQueue /> },
+    { value: 'hail', label: 'Hail Damage', icon: <Security /> },
   ];
 
-  const handlePolicySelect = (policyType) => {
-    setSelectedPolicy(policyType);
-    const policy = policyTypes.find(p => p.value === policyType);
-    setPremium(policy ? policy.premium : 0);
+  const handleCreate = async () => {
+    if (!coverage || !location || !policyType) return alert('Please fill all fields');
+    await createPolicy(location, coverage);
+    setCoverage('');
+    setPolicyType('');
   };
 
-  const handleCreatePolicy = async () => {
-    setLoading(true);
-    
-    setTimeout(() => {
-      const newPolicy = {
-        id: policies.length + 1,
-        type: policyTypes.find(p => p.value === selectedPolicy)?.label || '',
-        coverage: `$${coverage}`,
-        premium: `$${premium}/month`,
-        status: 'Pending',
-        trigger: 'Weather conditions monitored',
-      };
-      
-      setPolicies([...policies, newPolicy]);
-      setSelectedPolicy('');
-      setCoverage('');
-      setPremium(0);
-      setLoading(false);
-    }, 2000);
-  };
+  if (!isConnected) {
+    return (
+      <Container maxWidth="md" sx={{ py: 8 }}>
+        <Card sx={{ textAlign: 'center', p: 6 }}>
+          <Security sx={{ fontSize: 80, color: '#1a365d', mb: 3 }} />
+          <Typography variant="h4" gutterBottom sx={{ fontWeight: 600 }}>Connect Wallet Required</Typography>
+          <Typography color="text.secondary">Please connect your wallet to access insurance services</Typography>
+        </Card>
+      </Container>
+    );
+  }
 
   return (
-    <Box sx={{ width: '100vw', overflowX: 'hidden', bgcolor: '#fafafa', minHeight: '100vh' }}>
-      <Container maxWidth={false} disableGutters sx={{ width: '100vw', px: { xs: 3, md: 4 }, py: 4 }}>
-        <Box sx={{ mb: 6 }}>
-          <Typography 
-            variant="h3" 
-            gutterBottom 
-            sx={{ 
-              fontWeight: 700,
-              color: '#1a365d',
-              fontFamily: '"Manrope", "Inter", sans-serif',
-              mb: 2,
-            }}
-          >
-            🛡️ Weather Insurance
-          </Typography>
-          <Typography 
-            variant="h6" 
-            sx={{ 
-              color: '#4a5568',
-              fontFamily: '"Inter", "Roboto", sans-serif',
-              maxWidth: 600,
-            }}
-          >
-            Protect your crops with automated weather-triggered insurance policies powered by Chainlink oracles
-          </Typography>
-        </Box>
+    <Container maxWidth="xl" sx={{ py: 4 }}>
+      <Typography variant="h3" gutterBottom sx={{ fontWeight: 700, color: '#1a365d', mb: 1 }}>
+         Weather Insurance
+      </Typography>
+      <Typography variant="h6" sx={{ color: '#4a5568', mb: 4 }}>
+        Protect your crops with blockchain-powered weather insurance
+      </Typography>
 
-        <Box sx={{
-          display: 'grid',
-          gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' },
-          gap: 4,
-          mb: 6,
-        }}>
-          {/* Create New Policy */}
-          <Card sx={{ border: '1px solid #e2e8f0', boxShadow: 'none' }}>
+      <Grid container spacing={3} sx={{ mb: 4 }}>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card><CardContent>
+            <Typography variant="subtitle2" color="text.secondary">Active Policies</Typography>
+            <Typography variant="h4" sx={{ fontWeight: 700, color: '#1a365d' }}>
+              {policies.filter(p => p.active).length}
+            </Typography>
+          </CardContent></Card>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card><CardContent>
+            <Typography variant="subtitle2" color="text.secondary">Total Policies</Typography>
+            <Typography variant="h4" sx={{ fontWeight: 700, color: '#1a365d' }}>
+              {policies.length}
+            </Typography>
+          </CardContent></Card>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card><CardContent>
+            <Typography variant="subtitle2" color="text.secondary">Weather</Typography>
+            {weatherData && (
+              <Typography variant="h4" sx={{ fontWeight: 700, color: '#1a365d' }}>
+                {weatherData.temperature}C
+              </Typography>
+            )}
+          </CardContent></Card>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card><CardContent>
+            <Typography variant="subtitle2" color="text.secondary">Location</Typography>
+            <Typography variant="h6" sx={{ fontWeight: 600, color: '#1a365d' }}>
+              {location}
+            </Typography>
+          </CardContent></Card>
+        </Grid>
+      </Grid>
+      <Grid container spacing={4}>
+        <Grid item xs={12} lg={6}>
+          <Card>
             <CardContent sx={{ p: 4 }}>
-              <Typography 
-                variant="h6" 
-                gutterBottom
-                sx={{ 
-                  fontWeight: 600,
-                  fontFamily: '"Manrope", "Inter", sans-serif',
-                  mb: 3,
-                }}
-              >
+              <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
+                <Add sx={{ mr: 1, verticalAlign: 'middle' }} />
                 Create New Policy
               </Typography>
-              
+
               <FormControl fullWidth sx={{ mb: 3 }}>
                 <InputLabel>Policy Type</InputLabel>
-                <Select
-                  value={selectedPolicy}
-                  label="Policy Type"
-                  onChange={(e) => handlePolicySelect(e.target.value)}
-                >
-                  {policyTypes.map((policy) => (
-                    <MenuItem key={policy.value} value={policy.value}>
+                <Select value={policyType} label="Policy Type" onChange={(e) => setPolicyType(e.target.value)}>
+                  {policyTypes.map((p) => (
+                    <MenuItem key={p.value} value={p.value}>
                       <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        {policy.icon}
-                        <Typography sx={{ ml: 1 }}>{policy.label}</Typography>
+                        {p.icon}
+                        <Typography sx={{ ml: 1 }}>{p.label}</Typography>
                       </Box>
                     </MenuItem>
                   ))}
                 </Select>
               </FormControl>
 
-              <TextField
-                fullWidth
-                label="Coverage Amount ($)"
-                type="number"
-                value={coverage}
-                onChange={(e) => setCoverage(e.target.value)}
+              <TextField 
+                fullWidth 
+                label="Location (City)" 
+                value={location} 
+                onChange={(e) => setLocation(e.target.value)} 
                 sx={{ mb: 3 }}
               />
 
-              {selectedPolicy && (
+              <TextField 
+                fullWidth 
+                label="Coverage (ETH)" 
+                type="number" 
+                value={coverage} 
+                onChange={(e) => setCoverage(e.target.value)} 
+                sx={{ mb: 3 }}
+                inputProps={{ min: 0.01, step: 0.01 }}
+              />
+
+              {coverage && (
                 <Alert severity="info" sx={{ mb: 3 }}>
-                  Monthly Premium: ${premium} | 
-                  Automatic payout when weather conditions are met
+                  Premium: {(parseFloat(coverage || 0) * 0.05).toFixed(4)} ETH (5% of coverage)
                 </Alert>
               )}
 
-              <Button
-                variant="contained"
-                fullWidth
-                onClick={handleCreatePolicy}
-                disabled={!selectedPolicy || !coverage || loading}
-                sx={{ 
-                  py: 2,
-                  bgcolor: '#1a365d',
-                  '&:hover': { bgcolor: '#2d3748' }
-                }}
+              <Button 
+                variant="contained" 
+                fullWidth 
+                onClick={handleCreate} 
+                disabled={!policyType || !coverage || loading}
+                sx={{ py: 2, bgcolor: '#1a365d', '&:hover': { bgcolor: '#2d3748' } }}
               >
-                {loading ? 'Creating Policy...' : 'Create Insurance Policy'}
+                {loading ? <CircularProgress size={24} sx={{ color: 'white' }} /> : 'Create Policy'}
               </Button>
 
-              {loading && <LinearProgress sx={{ mt: 2 }} />}
+              {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
             </CardContent>
           </Card>
+        </Grid>
 
-          {/* Policy Benefits */}
-          <Card sx={{ border: '1px solid #e2e8f0', boxShadow: 'none' }}>
+        <Grid item xs={12} lg={6}>
+          <Card>
             <CardContent sx={{ p: 4 }}>
-              <Typography 
-                variant="h6" 
-                gutterBottom
-                sx={{ 
-                  fontWeight: 600,
-                  fontFamily: '"Manrope", "Inter", sans-serif',
-                  mb: 3,
-                }}
-              >
-                Policy Benefits
+              <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
+                <CloudQueue sx={{ mr: 1, verticalAlign: 'middle' }} />
+                Current Weather
               </Typography>
               
-              <Box sx={{ mb: 3 }}>
-                <Typography 
-                  variant="body2" 
-                  sx={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    mb: 2,
-                    fontFamily: '"Inter", "Roboto", sans-serif',
-                  }}
-                >
-                  <CheckCircle sx={{ mr: 1, color: '#059669', fontSize: 20 }} />
-                  Automated payouts via smart contracts
-                </Typography>
-                <Typography 
-                  variant="body2" 
-                  sx={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    mb: 2,
-                    fontFamily: '"Inter", "Roboto", sans-serif',
-                  }}
-                >
-                  <CheckCircle sx={{ mr: 1, color: '#059669', fontSize: 20 }} />
-                  Real-time weather data from AccuWeather
-                </Typography>
-                <Typography 
-                  variant="body2" 
-                  sx={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    mb: 2,
-                    fontFamily: '"Inter", "Roboto", sans-serif',
-                  }}
-                >
-                  <CheckCircle sx={{ mr: 1, color: '#059669', fontSize: 20 }} />
-                  No claim filing required
-                </Typography>
-                <Typography 
-                  variant="body2" 
-                  sx={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    mb: 2,
-                    fontFamily: '"Inter", "Roboto", sans-serif',
-                  }}
-                >
-                  <CheckCircle sx={{ mr: 1, color: '#059669', fontSize: 20 }} />
-                  Transparent blockchain verification
-                </Typography>
-              </Box>
+              {weatherLoading ? (
+                <Box sx={{ textAlign: 'center', py: 4 }}>
+                  <CircularProgress />
+                </Box>
+              ) : weatherData ? (
+                <Grid container spacing={2}>
+                  <Grid item xs={6}>
+                    <Card variant="outlined" sx={{ p: 2, textAlign: 'center' }}>
+                      <Typography variant="caption" color="text.secondary">Temperature</Typography>
+                      <Typography variant="h4" sx={{ fontWeight: 700 }}>{weatherData.temperature}C</Typography>
+                    </Card>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <Card variant="outlined" sx={{ p: 2, textAlign: 'center' }}>
+                      <Typography variant="caption" color="text.secondary">Condition</Typography>
+                      <Typography variant="h6" sx={{ fontWeight: 600 }}>{weatherData.condition}</Typography>
+                    </Card>
+                  </Grid>
+                  <Grid item xs={4}>
+                    <Card variant="outlined" sx={{ p: 2, textAlign: 'center' }}>
+                      <Typography variant="caption" color="text.secondary">Humidity</Typography>
+                      <Typography variant="body1" sx={{ fontWeight: 600 }}>{weatherData.humidity}%</Typography>
+                    </Card>
+                  </Grid>
+                  <Grid item xs={4}>
+                    <Card variant="outlined" sx={{ p: 2, textAlign: 'center' }}>
+                      <Typography variant="caption" color="text.secondary">Wind</Typography>
+                      <Typography variant="body1" sx={{ fontWeight: 600 }}>{weatherData.windSpeed} km/h</Typography>
+                    </Card>
+                  </Grid>
+                  <Grid item xs={4}>
+                    <Card variant="outlined" sx={{ p: 2, textAlign: 'center' }}>
+                      <Typography variant="caption" color="text.secondary">Rain</Typography>
+                      <Typography variant="body1" sx={{ fontWeight: 600 }}>{weatherData.precipitation} mm</Typography>
+                    </Card>
+                  </Grid>
+                </Grid>
+              ) : <Alert severity="info">Loading weather data...</Alert>}
 
-              <Alert severity="warning">
-                <Typography 
-                  variant="body2"
-                  sx={{ fontFamily: '"Inter", "Roboto", sans-serif' }}
-                >
-                  <Warning sx={{ mr: 1, fontSize: 16 }} />
-                  Weather conditions are monitored 24/7. Payouts are triggered automatically 
-                  when predefined thresholds are met.
-                </Typography>
-              </Alert>
+              {weatherData?.isMock && (
+                <Alert severity="warning" sx={{ mt: 2 }}>Using mock weather data. Add API key for real data.</Alert>
+              )}
             </CardContent>
           </Card>
-        </Box>
+        </Grid>
+      </Grid>
+      <Card sx={{ mt: 4 }}>
+        <CardContent sx={{ p: 4 }}>
+          <Typography variant="h5" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
+            Your Policies ({policies.length})
+          </Typography>
 
-        {/* Active Policies */}
-        <Card sx={{ border: '1px solid #e2e8f0', boxShadow: 'none' }}>
-          <CardContent sx={{ p: 4 }}>
-            <Typography 
-              variant="h6" 
-              gutterBottom
-              sx={{ 
-                fontWeight: 600,
-                fontFamily: '"Manrope", "Inter", sans-serif',
-                mb: 3,
-              }}
-            >
-              Your Active Policies
-            </Typography>
-            
-            <Box sx={{
-              display: 'grid',
-              gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' },
-              gap: 3,
-            }}>
-              {policies.map((policy) => (
-                <Card key={policy.id} variant="outlined" sx={{ border: '1px solid #e2e8f0' }}>
-                  <CardContent sx={{ p: 3 }}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                      <Typography 
-                        variant="subtitle1" 
-                        sx={{ 
-                          fontWeight: 600,
-                          fontFamily: '"Manrope", "Inter", sans-serif',
-                        }}
-                      >
-                        {policy.type}
-                      </Typography>
-                      <Chip
-                        label={policy.status}
-                        color={policy.status === 'Active' ? 'success' : 'warning'}
-                        size="small"
-                      />
-                    </Box>
-                    
-                    <Typography 
-                      variant="body2" 
-                      sx={{ 
-                        color: '#4a5568', 
-                        mb: 1,
-                        fontFamily: '"Inter", "Roboto", sans-serif',
-                      }}
-                    >
-                      Coverage: {policy.coverage}
-                    </Typography>
-                    <Typography 
-                      variant="body2" 
-                      sx={{ 
-                        color: '#4a5568', 
-                        mb: 1,
-                        fontFamily: '"Inter", "Roboto", sans-serif',
-                      }}
-                    >
-                      Premium: {policy.premium}
-                    </Typography>
-                    <Typography 
-                      variant="body2" 
-                      sx={{ 
-                        color: '#4a5568',
-                        fontFamily: '"Inter", "Roboto", sans-serif',
-                      }}
-                    >
-                      Trigger: {policy.trigger}
-                    </Typography>
-                    
-                    <Button
-                      variant="outlined"
-                      size="small"
-                      sx={{ 
-                        mt: 2,
-                        borderColor: '#e2e8f0',
-                        color: '#1a365d',
-                        '&:hover': {
-                          borderColor: '#1a365d',
-                          bgcolor: '#f7fafc',
-                        },
-                      }}
-                      fullWidth
-                    >
-                      View Details
-                    </Button>
-                  </CardContent>
-                </Card>
-              ))}
+          {policies.length > 0 ? (
+            <Grid container spacing={3}>
+              {policies.map((p, idx) => {
+                const isActive = p.active;
+                const policyId = p.id?.toString() || idx;
+                
+                return (
+                  <Grid item xs={12} sm={6} md={4} key={policyId}>
+                    <Card variant="outlined" sx={{ 
+                      border: '2px solid', 
+                      borderColor: isActive ? '#059669' : '#e2e8f0',
+                      '&:hover': { boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }
+                    }}>
+                      <CardContent>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                          <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                            Policy #{policyId}
+                          </Typography>
+                          <Chip 
+                            label={isActive ? 'Active' : 'Cancelled'} 
+                            color={isActive ? 'success' : 'default'} 
+                            size='small'
+                            icon={isActive ? <CheckCircle /> : <Cancel />}
+                          />
+                        </Box>
+                        
+                        <Typography variant="body2" sx={{ mb: 1 }}>
+                          <strong>Location:</strong> {p.location}
+                        </Typography>
+                        <Typography variant="body2" sx={{ mb: 1 }}>
+                          <strong>Coverage:</strong> {p.coverageAmount ? (Number(p.coverageAmount) / 1e18).toFixed(4) : '0'} ETH
+                        </Typography>
+                        <Typography variant="body2" sx={{ mb: 2 }}>
+                          <strong>Premium:</strong> {p.premiumPaid ? (Number(p.premiumPaid) / 1e18).toFixed(4) : '0'} ETH
+                        </Typography>
+
+                        <Button
+                          variant="outlined"
+                          color="error"
+                          size="small"
+                          fullWidth
+                          onClick={() => isActive && cancelPolicy(Number(p.id))}
+                          disabled={!isActive || loading}
+                          startIcon={<Cancel />}
+                        >
+                          {isActive ? 'Cancel Policy' : 'Cancelled'}
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                );
+              })}
+            </Grid>
+          ) : (
+            <Box sx={{ textAlign: 'center', py: 6, bgcolor: '#f7fafc', borderRadius: 2 }}>
+              <Security sx={{ fontSize: 64, color: '#cbd5e0', mb: 2 }} />
+              <Typography variant="h6" color="text.secondary">No policies yet</Typography>
+              <Typography variant="body2" color="text.secondary">Create your first policy above</Typography>
             </Box>
-
-            {policies.length === 0 && (
-              <Box sx={{ textAlign: 'center', py: 6 }}>
-                <Typography 
-                  variant="body2" 
-                  sx={{ 
-                    color: '#4a5568',
-                    fontFamily: '"Inter", "Roboto", sans-serif',
-                  }}
-                >
-                  No active policies. Create your first weather insurance policy above.
-                </Typography>
-              </Box>
-            )}
-          </CardContent>
-        </Card>
-      </Container>
-    </Box>
+          )}
+        </CardContent>
+      </Card>
+    </Container>
   );
 };
 

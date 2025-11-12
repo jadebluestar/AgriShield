@@ -84,7 +84,7 @@ Follow these steps to run the project locally.
 ```sh
 # 1. Clone the repository
  git clone <your-repo-url>
- cd AgriShieldnish
+ cd AgriShield
 
 # 2. Install Backend dependencies
  cd Backend
@@ -94,20 +94,24 @@ Follow these steps to run the project locally.
  cd ../Frontend
  npm install
 
-# 4. Start Hardhat local blockchain
- cd ../Backend
+# 4-6. Start services (Windows PowerShell)
+#    Open two terminals side by side
+
+# Terminal A – start local blockchain
+ cd ./Backend
+ npm install
  npx hardhat node
 
-# 5. Deploy contracts (in a new terminal)
- cd Backend
- npx hardhat run scripts/deploymentInsurance.js --network localhost
+# Terminal B – deploy contracts to localhost
+ cd ./Backend
+ npm run deploy:local
 
-# 6. Start the Frontend
- cd ../Frontend
+# Terminal C – start the frontend
+ cd ./Frontend
+ npm install
  npm run dev
 
-# 7. Open your browser and go to
- http://localhost:5173
+# Vite will print the URL (e.g., http://localhost:5173 or 5174)
 ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -115,11 +119,16 @@ Follow these steps to run the project locally.
 <a id="usage"></a>
 ## 🧑‍💻 Usage
 
-- Register as a farmer and mint your NFT
-- Purchase weather insurance
-- Track and trade carbon credits
-- Access dashboard for stats and weather
-- Use lending interface for loans(in progress)
+- Connect your wallet (MetaMask) to "Localhost 8545" (chainId 31337)
+  - If needed, add the network manually and optionally import Account #0 from Hardhat
+  - Account #0 (prefunded) address: 0xf39F...2266 (see Hardhat node banner)
+- Go to Insurance and create a policy
+  - Enter a location (string) and coverage amount (wei/ETH input supported by UI)
+  - Confirm the transaction in MetaMask
+- Cancel current insurance
+  - Use the Cancel button to call on-chain cancelPolicy() and receive a refund
+- Explore other modules
+  - Carbon credits, farmer NFT registration, dashboard widgets, and lending (in progress)
 
 _For more details, see the documentation in the `Frontend/src` and `Backend/contracts` folders._
 
@@ -142,4 +151,22 @@ _For more details, see the documentation in the `Frontend/src` and `Backend/cont
 Distributed under the MIT License. See `LICENSE` for more information.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+---
+
+## 🔧 Chainlink Functions (AccuWeather) setup (optional)
+
+The oracle-driven WeatherTriggeredInsurance is included for testnets. For local dev, the app uses a simple on-chain WeatherInsurance contract. To enable real weather triggers on a testnet:
+
+1) Deploy the Chainlink contract to a testnet (e.g., Fuji/Sepolia).
+2) Fund or create a Chainlink Functions subscription and note its ID.
+3) Configure the contract with your AccuWeather API key and inline source:
+
+   - In `Backend`, set environment variables and run the configure script:
+     - `CONTRACT=0xYourDeployedAddress` – Address of WeatherTriggeredInsurance
+     - `ACCUWEATHER_KEY=...` – Your AccuWeather API key
+     - `CLF_SUBSCRIPTION_ID=...` – Optional: your Functions subscription ID
+   - Then run: `npm run configure:functions`
+
+The contract exposes helpers like `getRecommendedAccuWeatherSource()` and admin setters (`setApiKey`, `setSource`, `setSubscription`). Wire UI to this path once deployed on a live network.
 

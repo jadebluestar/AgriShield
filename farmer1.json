@@ -1,0 +1,27 @@
+{
+  "name": "Rajawat Farm Token #001",
+  "description": "A digital asset representing the sustainable practices of the Rajawat Farm in Jaipur, Rajasthan.",
+  "image": "ipfs://3f4b2e8d9c1a0f7e6b5d4c3a2b1f0e9d8c7b6a5d4e3f2c1b0a9f8e7d6c5b4a39",
+  "attributes": [
+    {
+      "trait_type": "Farmer Name",
+      "value": "Nishant Singh Rajawat"
+    },
+    {
+      "trait_type": "Farm Size",
+      "value": "15 acres"
+    },
+    {
+      "trait_type": "Primary Crop",
+      "value": "Wheat"
+    },
+    {
+      "trait_type": "Farming Experience",
+      "value": "20 years"
+    },
+    {
+      "trait_type": "Location",
+      "value": "Jaipur, Rajasthan"
+    }
+  ]
+}

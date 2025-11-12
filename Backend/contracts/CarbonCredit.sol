@@ -2,7 +2,7 @@
 pragma solidity ^0.8.19;
 
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import {IERC721} from "forge-std/interfaces/IERC721.sol";
+import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
 contract CarbonCredit is ERC20 {
     error CarbonCredit__FarmerNFTNotMinted();
